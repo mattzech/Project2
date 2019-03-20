@@ -13,6 +13,7 @@ import java.io.IOException;
 public class XMLDocument {
     Document document;
     Element root;
+	private String file;
 
     XMLDocument(File file) {
         setXMLDocument(file);
@@ -20,9 +21,10 @@ public class XMLDocument {
 
     public void setXMLDocument(File file) {
         try {
+            this.file = "hamlet.xml";
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
-            document = builder.parse(file);
+            document = builder.parse(new File(this.file));
             root = document.getDocumentElement();
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
@@ -76,5 +78,23 @@ public class XMLDocument {
         lineNodeArray[lineNumber - 1].setTextContent(replacement);
         System.out.println("The sentence has been replaced as follows:\n" +
                 lineNodeArray[lineNumber - 1].getTextContent() + "\nDo you want to save changes? (Y/N)");
+    }
+    public boolean saveFile(String newFilename) {
+        boolean success = true;
+        try {
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            Result output = new StreamResult(new File(newFilename));
+            Source input = new DOMSource(this.document);
+            transformer.transform(input, output);
+        } catch (TransformerException e) {
+            e.printStackTrace();
+            success = false;
+        }
+        if (success) {
+            this.file = newFilename;
+        }
+
+        return success;
+
     }
 }
