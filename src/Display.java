@@ -13,6 +13,11 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 
+/**
+ * This is the display class for the GUI of the program
+ * @author James Stevenson and Matt Zech
+ *
+ */
 public class Display extends Application {
 
     private FlowPane pane = new FlowPane();
@@ -42,6 +47,11 @@ public class Display extends Application {
     private Button yesSaveBt = new Button ("Yes");
     private Button noSaveBt = new Button ("No");
 
+    /**
+     * Represents the setup of the stage including text fields and 
+     * buttons. It also includes the lay out and operattions of each
+     * action within the stage 
+     */
     public void start(Stage primaryStage) throws Exception {
         pane.setPadding(new Insets(11, 12, 13, 14));
         pane.setHgap(5);
@@ -91,21 +101,36 @@ public class Display extends Application {
         noSaveBt.setOnAction(e -> noSaveFile());
     }
 
+    /**
+     * Names the input file
+     * @param primaryStage
+     */
     public void chooseInputFile(Stage primaryStage){
         file = fileChooser.showOpenDialog(primaryStage);
         fileDisplay.setText(" Input file name: " + file.getName());
         xmlDocument.setXMLDocument(file);
     }
 
+    /**
+     * Names the file when outputting the changed XML
+     * @param primaryStage
+     */
     public void chooseOutputFile(Stage primaryStage) {
         outputFile = fileChooser.showOpenDialog(primaryStage);
         outputFileDisplay.setText(" Output file name: " + outputFile.getName());
     }
 
+    /**
+     * Outputs the total number of persona in the play
+     */
     public void findNumberOfPersona(){
         output.setText("There are " + xmlDocument.findNumberOfPersona() + " personae in " + file.getName());
     }
 
+    /**
+     * Searches for a speaker and outputs how many
+     * lines he/she has in the play
+     */
     public void findNumberOfSpeaker() {
         String speaker;
         if (speakerTF.getText().equals(""))
@@ -116,6 +141,10 @@ public class Display extends Application {
         output.setText(speaker + " speaks " + count + " times");
     }
 
+    /**
+     * Searches for a word or phrase within the play and outputs
+     * the different lines it appears in
+     */
     public void findLine() {
         searchResult = xmlDocument.findLine(searchLineTF.getText());
         if (searchResult.getNumberOfSentences() == 0)
@@ -131,6 +160,10 @@ public class Display extends Application {
         }
     }
 
+    /** 
+     * Asks user to replace the lines with a new phrase and then
+     * requests a save after replacing
+     */
     public void replaceLine(){
         if (!lineNumTF.getText().equals("") && Integer.parseInt(lineNumTF.getText()) <= searchResult.getNumberOfSentences() &&
                 Integer.parseInt(lineNumTF.getText()) > 0)
@@ -142,45 +175,68 @@ public class Display extends Application {
         pane.getChildren().removeAll(replaceTF, replaceBt, exitReplaceBt, lineNumTF);
     }
 
+    /** 
+     * Cleans up the stage after saving changes
+     */
     public void exitReplace(){
         pane.getChildren().removeAll(replaceTF, replaceBt, exitReplaceBt, lineNumTF);
         output.setText("");
     }
 
+    /**
+     * If the user selects yes to change the line
+     */
     public void yesReplaceLine(){
         searchResult.getLineNodeArray()[replaceNum - 1].setTextContent(replaceTF.getText());
         pane.getChildren().removeAll(yesReplaceBt, noReplaceBt);
         output.setText("");
     }
 
+    /**
+     * If the user selects not to change the line
+     */
     public void noReplaceLine(){
         pane.getChildren().removeAll(yesReplaceBt, noReplaceBt);
         pane.getChildren().addAll(replaceTF, replaceBt, exitReplaceBt, lineNumTF);
         findLine();
     }
 
-    //save file button
-    //if same, open yes no and output choice
-    //else saveFile
+    /**
+     * Method to check for overwriting possibility so if the names
+     * are the same, it can still be saved and replaced
+     */ 
+    
     public void checkSaveFile(){
-        if (file.getName().equals(outputFile.getName()))
+        // if same, open yes no and output choice
+    	if (file.getName().equals(outputFile.getName()))
         {
             output.setText("Would you like to overwrite file: " + file.getName());
             pane.getChildren().addAll(yesSaveBt, noSaveBt);
         }
+        // else saveFile
         else
             saveFile();
     }
+    /**
+     * Runs the saveFile method and cleans up the stage
+     */
     public void yesSaveFile(){
         saveFile();
         pane.getChildren().removeAll(yesSaveBt, noSaveBt);
     }
 
+    /**
+     * Only makes more room on the stage
+     */
     public void noSaveFile(){
         pane.getChildren().removeAll(yesSaveBt, noSaveBt);
         output.setText("");
     }
 
+    /** 
+     * Uses transformers to save the file within the computer
+     * Will output a message if successful
+     */
     public void saveFile() {
         boolean success = true;
         try {
